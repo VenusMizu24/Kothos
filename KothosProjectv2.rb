@@ -3,13 +3,6 @@ require "selenium-webdriver"
 require 'fileutils'
 
 #wait = Selenium::WebDriver::Wait.new
-$d = Time.now.strftime("%m/%d/%Y-%I:%M%p")
-$label = "Date: #{$d}
-Version: 1.0
-Logfile: Kothos Project
-Programmer: Nephtiry Bailey
-
-"
 
 class Reporting
 =begin
@@ -42,31 +35,42 @@ class Reporting
       $driver.save_screenshot($dirName+"\\Screencaps\\Chrome_screen_"+Time.now.strftime("%Y%m%d%H%M%S")+".png")
     end
     
+  $d = Time.now.strftime("%m/%d/%Y-%I:%M%p")
+  $label = "Date: #{$d}
+Version: 1.0
+Logfile: Kothos Project
+Programmer: Nephtiry Bailey
+  
+  "
+  puts "#{$label}"  
+   
   def createLog(logType)
     begin
       $logName = ($dirName+"\\KothosTest_"+Time.now.strftime("%Y%m%d%H%M%S")+".log")
-      File.open($logName,"w+")
+      File.open($logName,"w") do |log|
+        log.puts "#{$label}"
+      end
       return true
     rescue
       puts "Failed creating log"
       return false
     end
   end
-=begin
-  def reporting(logText)
-  begin
-      File.open($logName,"w+") do|logit|
-        logit.puts "#{$label}"
+  
+  def reporting(logText,ex)
+    begin
+      File.open($logName,"a") do|logit|
         logit.puts Time.now.strftime("%Y:%m:%d:%H:%M:%S")+"-#{logText}"
-        puts "#{$label}"
         puts Time.now.strftime("%Y:%m:%d:%H:%M:%S")+"-#{logText}"
+      end
     return true
-  rescue
+    rescue
     puts "Failed to post to log."
     return false
-   end
-=end
+    end
+  end
 end
+    
 
 class Kothostest < Reporting
   def chrome
@@ -78,26 +82,21 @@ class Kothostest < Reporting
       $driver.manage.window.maximize
       $driver.get("http://thecityofkothos.com/")
       $bin.saveImage("KothosHomepage")
-      #$bin.reporting(Time.now.inspect+": Opened Kothos Homepage",false)
-=begin
-
-      driver.find_element(:link, "Chapter Headings").click
-      driver.get("http://thecityofkothos.com/")
-      driver.find_element(:link, "Prologue").click
-      driver.get("http://thecityofkothos.com/")
-      driver.find_element(:link, "Glossary").click
-      driver.get("http://thecityofkothos.com/")
-      driver.find_element(:link, "Creston").click
-      driver.get("http://thecityofkothos.com/")
-      driver.find_element(:link, "Bella Tu").click
-      driver.get("http://thecityofkothos.com/")
-      driver.find_element(:link, "Tuppa Tu").click
-      driver.get("http://thecityofkothos.com/")
-      driver.find_element(:link, "Black & White").click
-=end
+      $bin.reporting(Time.now.inspect+": Logged Homepage",false)
+    end
+      for i in 0..6
+        pageTitle = ["Chapter Headings","Prologue","Glossary","Creston","Bella Tu","Tuppa Tu","Black & White"]
+        log = ["Logged Chapter Headings","Logged Prologue","Logged Glossary","Logged Creston","Logged Bella Tu","Logged Tuppa Tu","Logged Black & White"]  
+        $driver.find_element(:link, "#{pageTitle[i]}").click
+        $bin.saveImage("#{log}")
+        $bin.reporting(Time.now.inspect+": #{log[i]}",false)
+        $driver.get("http://thecityofkothos.com/")
+      end
+      return true
+    rescue
+      puts "Failed to log page."
     end
   end
-end
 
 $Koth=Kothostest.new
 $Koth.chrome
