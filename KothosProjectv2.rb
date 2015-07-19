@@ -24,6 +24,7 @@ class Reporting
     $dirName="C:\\temp\\KothosTest_"+Time.now.strftime("%Y%m%d%H%M%S")
       FileUtils.mkdir_p($dirName)
       FileUtils.mkdir_p($dirName+"\\Screencaps")
+      FileUtils.mkdir_p($dirName+"\\Errors")
     return true
   rescue
     puts "Failed to create directory"
@@ -56,7 +57,6 @@ Programmer: Nephtiry Bailey
       return false
     end
   end
-  
   def reporting(logText,ex)
     begin
       File.open($logName,"a") do|logit|
@@ -78,25 +78,42 @@ class Kothostest < Reporting
       $bin=Reporting.new
       $bin.createDir(false)
       $bin.createLog(false)
+      $bin.createDir($dirName+"\\Errors\\"+Time.now.strftime("%Y%m%d%H%M%S"))
+      $bin.reporting(Time.now.inspect+": Opening the browser... \n",false)
       $driver = Selenium::WebDriver.for :chrome
       $driver.manage.window.maximize
       $driver.get("http://thecityofkothos.com/")
+      if $driver.find_element(tag_name: 'img')
       $bin.saveImage("KothosHomepage")
+      $bin.reporting(Time.now.inspect+": Verified reached Homepage",false)
       $bin.reporting(Time.now.inspect+": Logged Homepage",false)
-    end
+      sleep(5)
+      else
+        $bin.reporting(Time.now.inspect+": WARNING-Failed to log page",true)
+        $driver.save_screenshot($dirName+"\\Errors\\Chrome_screen_"+Time.now.strftime("%Y%m%d%H%M%S")+".png")
+      end
       for i in 0..6
         pageTitle = ["Chapter Headings","Prologue","Glossary","Creston","Bella Tu","Tuppa Tu","Black & White"]
-        log = ["Logged Chapter Headings","Logged Prologue","Logged Glossary","Logged Creston","Logged Bella Tu","Logged Tuppa Tu","Logged Black & White"]  
+        log = ["Verified reached Chapter Headings","Verified reached Prologue","Verified reached Glossary","Verified reached Creston","Verified reached Bella Tu","Verified reached Tuppa Tu","Verified reached Black & White"]
+        log2 = ["Logged Chapter Headings","Logged Prologue","Logged Glossary","Logged Creston","Logged Bella Tu","Logged Tuppa Tu","Logged Black & White"]  
         $driver.find_element(:link, "#{pageTitle[i]}").click
-        $bin.saveImage("#{log}")
+        sleep(5)
+        if $driver.find_element(tag_name: 'img')
+        $bin.saveImage("#{log2}")
         $bin.reporting(Time.now.inspect+": #{log[i]}",false)
+        $bin.reporting(Time.now.inspect+": #{log2[i]}",false)
         $driver.get("http://thecityofkothos.com/")
+        else
+          $bin.reporting(Time.now.inspect+": WARNING-Failed to log page",true)
+        end
       end
-      return true
     rescue
       puts "Failed to log page."
-    end
+      $driver.save_screenshot($dirName+"\\Errors\\Chrome_screen_"+Time.now.strftime("%Y%m%d%H%M%S")+".png")
   end
+  end
+end
 
 $Koth=Kothostest.new
 $Koth.chrome
+$driver.quit
