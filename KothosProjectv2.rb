@@ -79,14 +79,14 @@ class Kothostest < Reporting
       $bin.createDir(false)
       $bin.createLog(false)
       $bin.createDir($dirName+"\\Errors\\"+Time.now.strftime("%Y%m%d%H%M%S"))
-      $bin.reporting(Time.now.inspect+": Opening the browser... \n",false)
+      $bin.reporting(": Opening the browser... \n",false)
       $driver = Selenium::WebDriver.for :chrome
       $driver.manage.window.maximize
       $driver.get("http://thecityofkothos.com/")
       if $driver.find_element(tag_name: 'img')
       $bin.saveImage("KothosHomepage")
-      $bin.reporting(Time.now.inspect+": Verified reached Homepage",false)
-      $bin.reporting(Time.now.inspect+": Logged Homepage",false)
+      $bin.reporting(": Verified reached Homepage",false)
+      $bin.reporting(": Logged Homepage",false)
       sleep(5)
       else
         $bin.reporting(Time.now.inspect+": WARNING-Failed to log page",true)
@@ -100,8 +100,8 @@ class Kothostest < Reporting
         sleep(5)
         if $driver.find_element(tag_name: 'img')
         $bin.saveImage("#{log2}")
-        $bin.reporting(Time.now.inspect+": #{log[i]}",false)
-        $bin.reporting(Time.now.inspect+": #{log2[i]}",false)
+        $bin.reporting(": #{log[i]}",false)
+        $bin.reporting(": #{log2[i]}",false)
         $driver.get("http://thecityofkothos.com/")
         else
           $bin.reporting(Time.now.inspect+": WARNING-Failed to log page",true)
