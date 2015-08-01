@@ -1,0 +1,45 @@
+{
+
+"DirectFail": "Failed to create directory",
+
+"LogFail": "Failed to post to log.",
+"PageFail": "Failed to log page.",
+
+"TopLabel": [
+"Version - 1.0",
+"Logfile - Kothos Project",
+"Programmer - Nephtiry Bailey"
+
+],
+
+"PageTitle": [
+"Chapter Headings",
+"Prologue",
+"Glossary",
+"Creston",
+"Bella Tu",
+"Tuppa Tu",
+"Black & White"
+],
+
+
+"log": [
+"Verified reached Chapter Headings",
+"Verified reached Prologue",
+"Verified reached Glossary",
+"Verified reached Creston",
+"Verified reached Bella Tu",
+"Verified reached Tuppa Tu",
+"Verified reached Black & White"
+],
+
+"log2": [
+"Logged Chapter Headings",
+"Logged Prologue","Logged Glossary",
+"Logged Creston","Logged Bella Tu",
+"Logged Tuppa Tu",
+"Logged Black & White"
+]
+
+}
+

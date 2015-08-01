@@ -1,8 +1,8 @@
 require "win32ole"
 require "selenium-webdriver"
 require 'fileutils'
-
-#wait = Selenium::WebDriver::Wait.new
+require 'yajl/json_gem'
+require 'pp'
 
 class Reporting
 =begin
@@ -15,7 +15,8 @@ class Reporting
     3) reporting (once the directory and log have been created you can write to the log
 =end
 
-
+  $json = File.read('C:\Users\Nephtiry\workspace\KothosProj\KPdata.json')
+  $obj = JSON.parse($json)
  
   def createDir(dir)
   begin
@@ -27,7 +28,7 @@ class Reporting
       FileUtils.mkdir_p($dirName+"\\Errors")
     return true
   rescue
-    puts "Failed to create directory"
+    puts $obj["DirectFail"]
     return false
   end
   end
@@ -35,21 +36,16 @@ class Reporting
   def saveImage(dir)
       $driver.save_screenshot($dirName+"\\Screencaps\\Chrome_screen_"+Time.now.strftime("%Y%m%d%H%M%S")+".png")
     end
-    
-  $d = Time.now.strftime("%m/%d/%Y-%I:%M%p")
-  $label = "Date: #{$d}
-Version: 1.0
-Logfile: Kothos Project
-Programmer: Nephtiry Bailey
-  
-  "
-  puts "#{$label}"  
+  $d = "Date - #{Time.now.strftime("%m/%d/%Y-%I:%M%p")}"
+  puts $d
+  puts $obj["TopLabel"]
    
   def createLog(logType)
     begin
       $logName = ($dirName+"\\KothosTest_"+Time.now.strftime("%Y%m%d%H%M%S")+".log")
       File.open($logName,"w") do |log|
-        log.puts "#{$label}"
+        log.puts $d
+        log.puts $obj["TopLabel"]
       end
       return true
     rescue
@@ -65,7 +61,7 @@ Programmer: Nephtiry Bailey
       end
     return true
     rescue
-    puts "Failed to post to log."
+    puts $obj["LogFail"]
     return false
     end
   end
@@ -93,13 +89,13 @@ class Kothostest < Reporting
         $driver.save_screenshot($dirName+"\\Errors\\Chrome_screen_"+Time.now.strftime("%Y%m%d%H%M%S")+".png")
       end
       for i in 0..6
-        pageTitle = ["Chapter Headings","Prologue","Glossary","Creston","Bella Tu","Tuppa Tu","Black & White"]
-        log = ["Verified reached Chapter Headings","Verified reached Prologue","Verified reached Glossary","Verified reached Creston","Verified reached Bella Tu","Verified reached Tuppa Tu","Verified reached Black & White"]
-        log2 = ["Logged Chapter Headings","Logged Prologue","Logged Glossary","Logged Creston","Logged Bella Tu","Logged Tuppa Tu","Logged Black & White"]  
-        $driver.find_element(:link, "#{pageTitle[i]}").click
+        obj2 = $obj["PageTitle"]
+        log = $obj["log"]
+        log2 = $obj["log2"]
+        $driver.find_element(:link, "#{obj2[i]}").click
         sleep(5)
         if $driver.find_element(tag_name: 'img')
-        $bin.saveImage("#{log2}")
+        $bin.saveImage("#{log2[i]}")
         $bin.reporting(": #{log[i]}",false)
         $bin.reporting(": #{log2[i]}",false)
         $driver.get("http://thecityofkothos.com/")
@@ -108,7 +104,7 @@ class Kothostest < Reporting
         end
       end
     rescue
-      puts "Failed to log page."
+      puts $obj["PageFail"]
       $driver.save_screenshot($dirName+"\\Errors\\Chrome_screen_"+Time.now.strftime("%Y%m%d%H%M%S")+".png")
   end
   end
