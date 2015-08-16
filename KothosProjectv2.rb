@@ -1,7 +1,8 @@
 require "win32ole"
 require "selenium-webdriver"
+require 'rubygems'
 require 'fileutils'
-require 'yajl/json_gem'
+require 'json'
 require 'pp'
 
 class Reporting
@@ -17,51 +18,54 @@ class Reporting
 
   $json = File.read('C:\Users\Nephtiry\workspace\KothosProj\KPdata.json')
   $obj = JSON.parse($json)
+  $string = $obj["FunctionString"]
+  $label = $obj["TopLabel"]
+  $timeform = $obj["Time"]
  
   def createDir(dir)
   begin
-    network=WIN32OLE.new("Wscript.Network")
+    network=WIN32OLE.new($string[0])
     username=network.username
-    $dirName="C:\\temp\\KothosTest_"+Time.now.strftime("%Y%m%d%H%M%S")
+    $dirName="C:"+$string[1]+Time.now.strftime($timeform[0])
       FileUtils.mkdir_p($dirName)
-      FileUtils.mkdir_p($dirName+"\\Screencaps")
-      FileUtils.mkdir_p($dirName+"\\Errors")
+      FileUtils.mkdir_p($dirName+$string[2])
+      FileUtils.mkdir_p($dirName+$string[3])
     return true
   rescue
-    puts $obj["DirectFail"]
+  puts $string[4]
     return false
   end
   end
   
   def saveImage(dir)
-      $driver.save_screenshot($dirName+"\\Screencaps\\Chrome_screen_"+Time.now.strftime("%Y%m%d%H%M%S")+".png")
+      $driver.save_screenshot($dirName+$string[5]+Time.now.strftime($timeform[0])+$string[6])
     end
-  $d = "Date - #{Time.now.strftime("%m/%d/%Y-%I:%M%p")}"
+  $d =  "#{$string[7]} #{Time.now.strftime($timeform[1])}"
   puts $d
-  puts $obj["TopLabel"]
+  puts $label
    
   def createLog(logType)
     begin
-      $logName = ($dirName+"\\KothosTest_"+Time.now.strftime("%Y%m%d%H%M%S")+".log")
+      $logName = ($dirName+$string[8]+Time.now.strftime($timeform[0])+$string[9])
       File.open($logName,"w") do |log|
         log.puts $d
-        log.puts $obj["TopLabel"]
+        log.puts $label
       end
       return true
     rescue
-      puts "Failed creating log"
+      puts $string[10]
       return false
     end
   end
   def reporting(logText,ex)
     begin
       File.open($logName,"a") do|logit|
-        logit.puts Time.now.strftime("%Y:%m:%d:%H:%M:%S")+"-#{logText}"
-        puts Time.now.strftime("%Y:%m:%d:%H:%M:%S")+"-#{logText}"
+        logit.puts Time.now.strftime($timeform[2])+"-#{logText}"
+        puts Time.now.strftime($timeform[2])+"-#{logText}"
       end
     return true
     rescue
-    puts $obj["LogFail"]
+    puts $string[11]
     return false
     end
   end
@@ -74,19 +78,19 @@ class Kothostest < Reporting
       $bin=Reporting.new
       $bin.createDir(false)
       $bin.createLog(false)
-      $bin.createDir($dirName+"\\Errors\\"+Time.now.strftime("%Y%m%d%H%M%S"))
-      $bin.reporting(": Opening the browser... \n",false)
+      $bin.createDir($dirName+$string[12]+Time.now.strftime($timeform[0]))
+      $bin.reporting($string[14],false)
       $driver = Selenium::WebDriver.for :chrome
       $driver.manage.window.maximize
       $driver.get("http://thecityofkothos.com/")
       if $driver.find_element(tag_name: 'img')
-      $bin.saveImage("KothosHomepage")
-      $bin.reporting(": Verified reached Homepage",false)
-      $bin.reporting(": Logged Homepage",false)
+      $bin.saveImage($string[15])
+      $bin.reporting($string[16],false)
+      $bin.reporting($string[17],false)
       sleep(5)
       else
-        $bin.reporting(Time.now.inspect+": WARNING-Failed to log page",true)
-        $driver.save_screenshot($dirName+"\\Errors\\Chrome_screen_"+Time.now.strftime("%Y%m%d%H%M%S")+".png")
+        $bin.reporting(Time.now.inspect+$string[18],true)
+        $driver.save_screenshot($dirName+$string[19]+Time.now.strftime($timeform[0])+$string[6])
       end
       for i in 0..6
         obj2 = $obj["PageTitle"]
@@ -95,17 +99,17 @@ class Kothostest < Reporting
         $driver.find_element(:link, "#{obj2[i]}").click
         sleep(5)
         if $driver.find_element(tag_name: 'img')
-        $bin.saveImage("#{log2[i]}")
-        $bin.reporting(": #{log[i]}",false)
-        $bin.reporting(": #{log2[i]}",false)
+        $bin.saveImage(log2[i])
+        $bin.reporting(log[i],false)
+        $bin.reporting(log2[i],false)
         $driver.get("http://thecityofkothos.com/")
         else
-          $bin.reporting(Time.now.inspect+": WARNING-Failed to log page",true)
+          $bin.reporting(Time.now.inspect+$string[18],true)
         end
       end
     rescue
-      puts $obj["PageFail"]
-      $driver.save_screenshot($dirName+"\\Errors\\Chrome_screen_"+Time.now.strftime("%Y%m%d%H%M%S")+".png")
+      puts $string[13]
+      $driver.save_screenshot($dirName+$string[18]+Time.now.strftime($timeform[0])+$string)
   end
   end
 end

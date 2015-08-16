@@ -1,9 +1,33 @@
 {
+"FunctionString": [
+"Wscript.network",
+"\\temp\\KothosTest_",
+"\\Screencaps",
+"\\Errors",
+"Failed to create directory",
+"\\Screencaps\\Chrome_screen_",
+".png",
+"Date - ",
+"\\KothosTest_",
+".log",
+"Failed creating log",
+"Failed to post to log.",
+"\\Errors\\",
+"Failed to log page.",
+"Opening the browser...",
+"KothosHompage",
+"Verified Reached Homepage",
+"Logged Homepage",
+"WARNING-Failed to log page",
+"\\Errors\\Chrome_screen_"
 
-"DirectFail": "Failed to create directory",
+],
 
-"LogFail": "Failed to post to log.",
-"PageFail": "Failed to log page.",
+"Time":[
+"%Y%m%d%H%M%S",
+"%m/%d/%Y-%I:%M%p",
+"%Y:%m:%d:%H:%M:%S"
+],
 
 "TopLabel": [
 "Version - 1.0",
